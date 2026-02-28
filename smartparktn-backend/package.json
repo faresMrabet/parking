@@ -4,10 +4,11 @@
   "description": "Backend SmartParkTN - Système de gestion de parking intelligent",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node server-dev.js",
+    "dev": "nodemon server-dev.js",
     "seed": "node seed.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vercel-build": "echo 'Build complete'"
   },
   "keywords": [],
   "author": "",

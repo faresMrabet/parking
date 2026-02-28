@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: '/api',
+  apiUrl: 'https://your-backend-url.vercel.app/api',  // À mettre à jour après déploiement backend
   
   // Plate Recognizer API Configuration
   plateRecognizerApiUrl: 'https://api.platerecognizer.com/v1/plate-reader/',

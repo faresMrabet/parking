@@ -1,0 +1,12 @@
+node_modules
+.env
+*.log
+test-*.js
+*.http
+.git
+.gitignore
+README.md
+PROJECT-STRUCTURE.txt
+QUICKSTART.md
+STEP1-COMPLETE.md
+ASSISTANT-IA-LOCAL-READY.md
