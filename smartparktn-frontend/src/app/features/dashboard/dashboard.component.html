@@ -1,0 +1,120 @@
+<div class="dashboard-container">
+  <div class="header">
+    <div class="header-content">
+      <h1>
+        <mat-icon>dashboard</mat-icon>
+        Dashboard
+      </h1>
+      <p>Vue d'ensemble en temps réel de votre parking intelligent</p>
+    </div>
+    <div class="header-actions">
+      <button mat-raised-button (click)="refresh()">
+        <mat-icon>refresh</mat-icon>
+        Actualiser
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="60"></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button (click)="refresh()">
+      <mat-icon>refresh</mat-icon>
+      Réessayer
+    </button>
+  </div>
+
+  <div *ngIf="dashboardData && !loading" class="stats-grid">
+    <mat-card class="stat-card vehicles">
+      <mat-card-content>
+        <div class="stat-header">
+          <div class="stat-icon">
+            <mat-icon>directions_car</mat-icon>
+          </div>
+          <div class="stat-trend up">
+            <mat-icon>trending_up</mat-icon>
+            <span>Actif</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ dashboardData.vehiclesInParking }}</div>
+        <div class="stat-label">Véhicules Présents</div>
+        <div class="stat-footer">
+          <span class="stat-detail">Dans le parking actuellement</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card revenue">
+      <mat-card-content>
+        <div class="stat-header">
+          <div class="stat-icon">
+            <mat-icon>payments</mat-icon>
+          </div>
+          <div class="stat-trend up">
+            <mat-icon>trending_up</mat-icon>
+            <span>+12%</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ dashboardData.todayRevenue }} <small style="font-size: 24px;">TND</small></div>
+        <div class="stat-label">Recettes du Jour</div>
+        <div class="stat-footer">
+          <span class="stat-detail">Total aujourd'hui</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card entries">
+      <mat-card-content>
+        <div class="stat-header">
+          <div class="stat-icon">
+            <mat-icon>login</mat-icon>
+          </div>
+          <div class="stat-trend up">
+            <mat-icon>trending_up</mat-icon>
+            <span>+8%</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ dashboardData.todayEntries }}</div>
+        <div class="stat-label">Entrées Aujourd'hui</div>
+        <div class="stat-footer">
+          <span class="stat-detail">Véhicules entrés</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card refused">
+      <mat-card-content>
+        <div class="stat-header">
+          <div class="stat-icon">
+            <mat-icon>block</mat-icon>
+          </div>
+          <div class="stat-trend" [class.up]="dashboardData.todayRefused === 0" [class.down]="dashboardData.todayRefused > 0">
+            <mat-icon>{{ dashboardData.todayRefused === 0 ? 'check_circle' : 'warning' }}</mat-icon>
+            <span>{{ dashboardData.todayRefused === 0 ? 'Aucun' : dashboardData.todayRefused }}</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ dashboardData.todayRefused }}</div>
+        <div class="stat-label">Refus Aujourd'hui</div>
+        <div class="stat-footer">
+          <span class="stat-detail">Accès refusés</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div *ngIf="dashboardData && !loading" class="actions">
+    <button mat-raised-button routerLink="/alpr">
+      <mat-icon>videocam</mat-icon>
+      Reconnaissance ALPR
+    </button>
+    <button mat-raised-button routerLink="/history">
+      <mat-icon>history</mat-icon>
+      Voir l'Historique
+    </button>
+  </div>
+</div>

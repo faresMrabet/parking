@@ -1,0 +1,275 @@
+/* ============================================
+   App Component - Layout Principal
+   ============================================ */
+
+.app-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #4A5270 100%);
+  box-shadow: 0 4px 12px var(--shadow);
+  padding: 0;
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  gap: 24px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.02);
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    svg {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+  }
+  
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    
+    span {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  }
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px !important;
+  border-radius: 12px !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  position: relative;
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+  
+  span {
+    font-size: 14px;
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    transform: translateY(-2px);
+  }
+  
+  &.active {
+    background: var(--accent) !important;
+    color: var(--primary-dark) !important;
+    box-shadow: 0 4px 12px rgba(225, 217, 188, 0.3);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px 3px 0 0;
+    }
+  }
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  button {
+    color: white !important;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+  
+  .notification-btn {
+    position: relative;
+  }
+}
+
+.app-content {
+  min-height: calc(100vh - 80px - 80px);
+  background: var(--background);
+  padding: 0;
+}
+
+.app-footer {
+  background: var(--primary-dark);
+  color: white;
+  padding: 24px;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+  
+  a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: var(--accent);
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .navbar-container {
+    padding: 12px 16px;
+  }
+  
+  .navbar-menu {
+    gap: 4px;
+  }
+  
+  .nav-item {
+    padding: 10px 16px !important;
+    
+    span {
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .navbar-brand {
+    .brand-text {
+      h1 {
+        font-size: 18px;
+      }
+      
+      span {
+        font-size: 10px;
+      }
+    }
+  }
+  
+  .navbar-menu {
+    order: 3;
+    width: 100%;
+    justify-content: space-around;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .nav-item {
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 12px !important;
+    
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+    
+    span {
+      font-size: 11px;
+    }
+    
+    &.active::after {
+      display: none;
+    }
+  }
+  
+  .navbar-actions {
+    order: 2;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-links {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-brand {
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+  
+  .nav-item span {
+    display: none;
+  }
+}

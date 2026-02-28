@@ -1,0 +1,210 @@
+<div class="alpr-container">
+  <div class="header">
+    <div class="header-content">
+      <h1>ALPR - Reconnaissance de Plaques</h1>
+      <p>Système automatique de reconnaissance de plaques d'immatriculation</p>
+    </div>
+    <button mat-raised-button routerLink="/dashboard">
+      <mat-icon>dashboard</mat-icon>
+      Retour au Dashboard
+    </button>
+  </div>
+
+  <div class="content-grid">
+    <!-- Zone de capture caméra -->
+    <mat-card class="capture-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>videocam</mat-icon>
+        <mat-card-title>Caméra en Direct</mat-card-title>
+        <mat-card-subtitle>
+          Positionnez la plaque devant la caméra et capturez
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="camera-mode">
+          <!-- Vidéo caméra -->
+          <div class="video-container" *ngIf="!cameraActive">
+            <div class="camera-placeholder">
+              <mat-icon>videocam_off</mat-icon>
+              <p>Activation de la caméra...</p>
+            </div>
+          </div>
+
+          <div class="video-container" *ngIf="cameraActive">
+            <video #videoElement autoplay playsinline></video>
+            <div class="video-overlay">
+              <div class="scan-frame"></div>
+            </div>
+          </div>
+
+          <!-- Bouton de capture -->
+          <div class="camera-controls" *ngIf="cameraActive">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="captureAndRecognize()"
+              [disabled]="loading"
+              class="capture-button">
+              <mat-icon>camera</mat-icon>
+              Capturer et Reconnaître
+            </button>
+          </div>
+
+          <!-- Plaque détectée -->
+          <div class="detected-plate" *ngIf="detectedPlate && !loading">
+            <mat-form-field appearance="outline" class="plate-input">
+              <mat-label>Plaque détectée</mat-label>
+              <input matInput [(ngModel)]="detectedPlate" readonly>
+              <mat-icon matPrefix>check_circle</mat-icon>
+            </mat-form-field>
+
+            <!-- Affichage de la confidence -->
+            <div class="confidence-display" *ngIf="recognitionConfidence">
+              <div class="confidence-bar">
+                <div class="confidence-fill" [style.width.%]="recognitionConfidence * 100"></div>
+              </div>
+              <span class="confidence-text">
+                <mat-icon>verified</mat-icon>
+                Confiance: {{ (recognitionConfidence * 100).toFixed(1) }}%
+              </span>
+            </div>
+          </div>
+
+          <!-- Message d'erreur de reconnaissance -->
+          <div class="recognition-error" *ngIf="recognitionError">
+            <mat-icon>warning</mat-icon>
+            <span>{{ recognitionError }}</span>
+          </div>
+        </div>
+
+        <!-- Loader -->
+        <div *ngIf="loading" class="loading-overlay">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>{{ loadingMessage }}</p>
+          <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Zone de résultat -->
+    <mat-card class="result-card" *ngIf="result">
+      <mat-card-header>
+        <mat-icon 
+          mat-card-avatar 
+          [class.success]="result.success" 
+          [class.error]="!result.success">
+          {{ result.success ? 'check_circle' : 'error' }}
+        </mat-icon>
+        <mat-card-title>
+          {{ result.type === 'entry' ? 'Entrée' : 'Sortie' }} - {{ result.plateNumber }}
+          <!-- Badge catégorie -->
+          <mat-chip *ngIf="result.vehicleCategory" [color]="getCategoryColor(result.vehicleCategory)" class="category-badge">
+            <mat-icon>{{ getCategoryIcon(result.vehicleCategory) }}</mat-icon>
+            {{ result.vehicleCategory }}
+          </mat-chip>
+        </mat-card-title>
+        <mat-card-subtitle>
+          {{ formatDate(result.timestamp) }}
+          <!-- Affichage confidence si disponible -->
+          <span *ngIf="result.confidence" class="confidence-badge">
+            <mat-icon>verified</mat-icon>
+            {{ (result.confidence * 100).toFixed(1) }}%
+          </span>
+        </mat-card-subtitle>
+        <button mat-icon-button (click)="clearResult()" class="close-button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="result-content" [class.success]="result.success" [class.error]="!result.success">
+          <div class="result-message">
+            <mat-icon>{{ result.success ? 'check_circle' : 'block' }}</mat-icon>
+            <h3>{{ result.message }}</h3>
+          </div>
+
+          <!-- Détails Entrée -->
+          <div *ngIf="result.success && result.type === 'entry'" class="result-details">
+            <div class="detail-item">
+              <mat-icon>schedule</mat-icon>
+              <div>
+                <strong>Heure d'entrée</strong>
+                <p>{{ formatDate(result.data.entryTime) }}</p>
+              </div>
+            </div>
+            <div class="detail-item" *ngIf="result.data.vehicleType">
+              <mat-icon>local_offer</mat-icon>
+              <div>
+                <strong>Type de véhicule</strong>
+                <p>{{ result.data.vehicleType }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Détails Sortie -->
+          <div *ngIf="result.success && result.type === 'exit'" class="result-details">
+            <div class="detail-item">
+              <mat-icon>schedule</mat-icon>
+              <div>
+                <strong>Durée de stationnement</strong>
+                <p>{{ formatDuration(result.data.duration) }}</p>
+              </div>
+            </div>
+            <div class="detail-item">
+              <mat-icon>attach_money</mat-icon>
+              <div>
+                <strong>Montant à payer</strong>
+                <p class="amount">{{ result.data.amount }} TND</p>
+              </div>
+            </div>
+            <div class="detail-item">
+              <mat-icon>rule</mat-icon>
+              <div>
+                <strong>Règle appliquée</strong>
+                <p>{{ result.data.ruleApplied }}</p>
+              </div>
+            </div>
+            <div class="detail-item">
+              <mat-icon>logout</mat-icon>
+              <div>
+                <strong>Heure de sortie</strong>
+                <p>{{ formatDate(result.data.exitTime) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Historique récent -->
+  <mat-card class="history-card" *ngIf="recentOperations.length > 0">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>history</mat-icon>
+      <mat-card-title>Opérations Récentes</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="recent-operations">
+        <div 
+          *ngFor="let op of recentOperations" 
+          class="operation-item"
+          [class.success]="op.success"
+          [class.error]="!op.success">
+          <mat-icon>{{ op.success ? 'check_circle' : 'error' }}</mat-icon>
+          <div class="operation-info">
+            <strong>{{ op.plateNumber }}</strong>
+            <span>{{ op.type === 'entry' ? 'Entrée' : 'Sortie' }} - {{ formatDate(op.timestamp) }}</span>
+          </div>
+          <mat-chip [color]="op.success ? 'primary' : 'warn'">
+            {{ op.success ? 'Succès' : 'Échec' }}
+          </mat-chip>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

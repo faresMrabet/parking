@@ -1,0 +1,44 @@
+### Test de la route racine
+GET http://localhost:5000/
+
+###
+
+### Enregistrer une entrée - Visiteur
+POST http://localhost:5000/api/entry
+Content-Type: application/json
+
+{
+  "plateNumber": "123TUN4567"
+}
+
+###
+
+### Enregistrer une entrée - Autre véhicule
+POST http://localhost:5000/api/entry
+Content-Type: application/json
+
+{
+  "plateNumber": "456TUN7890"
+}
+
+###
+
+### Enregistrer une sortie
+POST http://localhost:5000/api/exit
+Content-Type: application/json
+
+{
+  "plateNumber": "123TUN4567"
+}
+
+###
+
+### Dashboard - Statistiques
+GET http://localhost:5000/api/dashboard
+
+###
+
+### Historique - Toutes les entrées/sorties
+GET http://localhost:5000/api/history?limit=20&page=1
+
+###

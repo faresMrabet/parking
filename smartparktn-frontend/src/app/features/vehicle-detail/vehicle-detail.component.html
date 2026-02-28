@@ -1,0 +1,161 @@
+<div class="vehicle-detail-container">
+  <div class="header">
+    <div class="header-content">
+      <mat-icon>directions_car</mat-icon>
+      <h1>Détails Véhicule: {{ plateNumber }}</h1>
+    </div>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Retour
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <mat-icon>error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="warn" (click)="loadVehicleData()">Réessayer</button>
+  </div>
+
+  <div *ngIf="!loading && !error && entries.length > 0">
+    <!-- Statistiques du véhicule -->
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="primary">confirmation_number</mat-icon>
+          <mat-card-title>Total Visites</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ getTotalVisits() }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="accent">attach_money</mat-icon>
+          <mat-card-title>Total Payé</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ getTotalAmount() }} TND</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card" *ngIf="getActiveEntry()">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="warn">schedule</mat-icon>
+          <mat-card-title>Statut Actuel</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-chip color="accent">Dans le parking</mat-chip>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Entrée active -->
+    <mat-card *ngIf="getActiveEntry()" class="active-entry-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar color="accent">local_parking</mat-icon>
+        <mat-card-title>Véhicule Actuellement dans le Parking</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="entry-details">
+          <div class="detail-item">
+            <mat-icon>login</mat-icon>
+            <div>
+              <strong>Heure d'entrée</strong>
+              <p>{{ formatDate(getActiveEntry()!.entryTime) }}</p>
+            </div>
+          </div>
+          <div class="detail-item">
+            <mat-icon>check_circle</mat-icon>
+            <div>
+              <strong>Statut</strong>
+              <p><mat-chip [color]="getStatusColor(getActiveEntry()!.status)">{{ getStatusLabel(getActiveEntry()!.status) }}</mat-chip></p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Historique des entrées -->
+    <mat-card class="history-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>history</mat-icon>
+        <mat-card-title>Historique Complet</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let entry of entries; let i = index">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>event</mat-icon>
+                Visite #{{ entries.length - i }}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ formatDate(entry.entryTime) }}
+                <mat-chip [color]="getStatusColor(entry.status)" class="status-chip">
+                  {{ getStatusLabel(entry.status) }}
+                </mat-chip>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="entry-detail-grid">
+              <div class="detail-row">
+                <mat-icon>login</mat-icon>
+                <div>
+                  <strong>Heure d'entrée</strong>
+                  <p>{{ formatDate(entry.entryTime) }}</p>
+                </div>
+              </div>
+
+              <div class="detail-row">
+                <mat-icon>logout</mat-icon>
+                <div>
+                  <strong>Heure de sortie</strong>
+                  <p *ngIf="entry.exitTime">{{ formatDate(entry.exitTime) }}</p>
+                  <mat-chip *ngIf="!entry.exitTime" color="accent">En cours</mat-chip>
+                </div>
+              </div>
+
+              <div class="detail-row">
+                <mat-icon>schedule</mat-icon>
+                <div>
+                  <strong>Durée</strong>
+                  <p>{{ formatDuration(entry.duration) }}</p>
+                </div>
+              </div>
+
+              <div class="detail-row">
+                <mat-icon>attach_money</mat-icon>
+                <div>
+                  <strong>Montant</strong>
+                  <p class="amount">{{ entry.amount }} TND</p>
+                </div>
+              </div>
+
+              <div class="detail-row" *ngIf="entry.ruleApplied">
+                <mat-icon>rule</mat-icon>
+                <div>
+                  <strong>Règle appliquée</strong>
+                  <p>{{ entry.ruleApplied }}</p>
+                </div>
+              </div>
+
+              <div class="detail-row">
+                <mat-icon>check_circle</mat-icon>
+                <div>
+                  <strong>Statut</strong>
+                  <p><mat-chip [color]="getStatusColor(entry.status)">{{ getStatusLabel(entry.status) }}</mat-chip></p>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<nav class="app-navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <div class="logo">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="8" fill="#E1D9BC"/>
+          <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" fill="#30364F"/>
+          <circle cx="20" cy="20" r="4" fill="#ACBAC4"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>SmartParkTN</h1>
+        <span>Parking Intelligent</span>
+      </div>
+    </div>
+    
+    <div class="navbar-menu">
+      <button mat-button routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </button>
+      <button mat-button routerLink="/alpr" routerLinkActive="active" class="nav-item">
+        <mat-icon>videocam</mat-icon>
+        <span>ALPR</span>
+      </button>
+      <button mat-button routerLink="/history" routerLinkActive="active" class="nav-item">
+        <mat-icon>history</mat-icon>
+        <span>Historique</span>
+      </button>
+      <button mat-button routerLink="/assistant" routerLinkActive="active" class="nav-item">
+        <mat-icon>smart_toy</mat-icon>
+        <span>Assistant IA</span>
+      </button>
+    </div>
+    
+    <div class="navbar-actions">
+      <button mat-icon-button class="notification-btn">
+        <mat-icon [matBadge]="3" matBadgeColor="warn" matBadgeSize="small">notifications</mat-icon>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="app-content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="app-footer">
+  <div class="footer-content">
+    <p>© 2026 SmartParkTN - Système de gestion de parking intelligent</p>
+    <div class="footer-links">
+      <a href="#">À propos</a>
+      <a href="#">Support</a>
+      <a href="#">Documentation</a>
+    </div>
+  </div>
+</footer>

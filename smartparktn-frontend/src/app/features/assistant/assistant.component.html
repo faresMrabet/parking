@@ -1,0 +1,194 @@
+<div class="assistant-container">
+  <div class="header">
+    <div class="header-content">
+      <mat-icon>smart_toy</mat-icon>
+      <div>
+        <h1>Assistant Intelligent</h1>
+        <p>Posez vos questions sur le parking SmartParkTN</p>
+      </div>
+    </div>
+    <button mat-raised-button color="warn" (click)="clearChat()">
+      <mat-icon>delete_sweep</mat-icon>
+      Effacer
+    </button>
+  </div>
+
+  <div class="chat-layout">
+    <!-- Zone de messages -->
+    <div class="messages-section">
+      <div class="messages-container" #messagesContainer>
+        <div *ngFor="let message of messages" 
+             class="message-wrapper"
+             [class.user-message]="message.sender === 'user'"
+             [class.assistant-message]="message.sender === 'assistant'">
+          
+          <div class="message-bubble">
+            <div class="message-header">
+              <mat-icon>{{ message.sender === 'user' ? 'person' : 'smart_toy' }}</mat-icon>
+              <span class="sender-name">{{ message.sender === 'user' ? 'Vous' : 'Assistant' }}</span>
+              <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+            </div>
+
+            <!-- Message texte -->
+            <div *ngIf="message.type === 'text'" class="message-content">
+              <p [innerHTML]="message.text | nl2br"></p>
+            </div>
+
+            <!-- Message statistiques -->
+            <div *ngIf="message.type === 'stats'" class="message-content stats-content">
+              <p class="stats-title">{{ message.text }}</p>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <mat-icon>local_parking</mat-icon>
+                  <div>
+                    <strong>{{ message.data.vehiclesInParking }}</strong>
+                    <span>Véhicules présents</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <mat-icon>attach_money</mat-icon>
+                  <div>
+                    <strong>{{ message.data.todayRevenue }} TND</strong>
+                    <span>Revenus du jour</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <mat-icon>login</mat-icon>
+                  <div>
+                    <strong>{{ message.data.todayEntries }}</strong>
+                    <span>Entrées aujourd'hui</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <mat-icon>block</mat-icon>
+                  <div>
+                    <strong>{{ message.data.todayRefused }}</strong>
+                    <span>Refusés</span>
+                  </div>
+                </div>
+                <div class="stat-item occupation">
+                  <mat-icon>pie_chart</mat-icon>
+                  <div>
+                    <strong>{{ message.data.occupationRate }}%</strong>
+                    <span>Taux d'occupation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message recommandations -->
+            <div *ngIf="message.type === 'recommendation'" class="message-content recommendations-content">
+              <p class="recommendations-title">{{ message.text }}</p>
+              <div class="recommendations-list">
+                <div *ngFor="let rec of message.data.recommendations" 
+                     class="recommendation-item"
+                     [class.warning]="rec.type === 'warning'"
+                     [class.alert]="rec.type === 'alert'"
+                     [class.success]="rec.type === 'success'"
+                     [class.info]="rec.type === 'info'">
+                  <div class="rec-icon">{{ rec.icon }}</div>
+                  <div class="rec-content">
+                    <strong>{{ rec.title }}</strong>
+                    <p>{{ rec.message }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Indicateur de chargement -->
+        <div *ngIf="isLoading" class="message-wrapper assistant-message">
+          <div class="message-bubble loading-bubble">
+            <div class="message-header">
+              <mat-icon>smart_toy</mat-icon>
+              <span class="sender-name">Assistant</span>
+            </div>
+            <div class="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone de saisie -->
+      <div class="input-section">
+        <mat-form-field appearance="outline" class="message-input">
+          <mat-label>Posez votre question...</mat-label>
+          <textarea 
+            matInput 
+            [(ngModel)]="userInput"
+            (keypress)="onKeyPress($event)"
+            [disabled]="isLoading"
+            rows="2"
+            placeholder="Ex: Combien de véhicules sont dans le parking ?"></textarea>
+          <mat-icon matPrefix>chat</mat-icon>
+        </mat-form-field>
+        <button 
+          mat-fab 
+          color="primary" 
+          (click)="sendMessage()"
+          [disabled]="!userInput.trim() || isLoading"
+          class="send-button">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Panneau latéral avec suggestions -->
+    <div class="sidebar-section">
+      <mat-card class="suggestions-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>lightbulb</mat-icon>
+          <mat-card-title>Questions Suggérées</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="suggestions-list">
+            <button 
+              *ngFor="let question of suggestedQuestions"
+              mat-stroked-button
+              class="suggestion-button"
+              (click)="useSuggestedQuestion(question)"
+              [disabled]="isLoading">
+              <mat-icon>help_outline</mat-icon>
+              {{ question }}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>info</mat-icon>
+          <mat-card-title>Capacités de l'Assistant</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="capabilities-list">
+            <div class="capability-item">
+              <mat-icon>rule</mat-icon>
+              <span>Règles de tarification</span>
+            </div>
+            <div class="capability-item">
+              <mat-icon>analytics</mat-icon>
+              <span>Statistiques en temps réel</span>
+            </div>
+            <div class="capability-item">
+              <mat-icon>directions_car</mat-icon>
+              <span>Infos véhicules</span>
+            </div>
+            <div class="capability-item">
+              <mat-icon>block</mat-icon>
+              <span>Gestion blacklist</span>
+            </div>
+            <div class="capability-item">
+              <mat-icon>tips_and_updates</mat-icon>
+              <span>Recommandations</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
